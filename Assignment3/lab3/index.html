@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tip Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input, 
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .tip-percentage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tip-percentage span {
+            font-size: 1em;
+        }
+
+        .tip-slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .result {
+            font-size: 1.2em;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .currency-box {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eef2f7;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Media queries for mobile */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .result {
+                font-size: 1.1em;
+            }
+
+            .currency-box {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tip Calculator</h1>
+
+    <div class="input-group">
+        <label for="billTotal">Bill Total ($):</label>
+        <input type="number" id="billTotal" min="0" step="0.01" placeholder="Enter bill amount" onfocus="clearField()">
+        <span id="billError" class="error"></span>
+    </div>
+    
+
+    <div class="input-group">
+        <label for="currency">Select Currency:</label>
+        <select id="currency">
+            <option value="USD" data-rate="1">US Dollars ($)</option>
+            <option value="INR" data-rate="84.07">Indian Rupee (₹)</option>
+            <option value="JPY" data-rate="149.34">Japanese Yen (¥)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label for="tipPercentage" class="tip-percentage">
+            Tip: <span id="tipPercentDisplay">0%</span>
+        </label>
+        <input type="range" id="tipPercentage" class="tip-slider" min="0" max="100" value="0">
+    </div>
+
+    <div class="result">
+        Converted Tip Amount: <span id="tipAmount">$0.00</span>
+    </div>
+    <div class="result">
+        Converted Total Bill with Tip: <span id="totalAmount">$0.00</span>
+    </div>
+
+    <div class="currency-box">
+        <strong>Currency conversion:</strong><br>
+        $1 USD = ¥149.34 JPY for Yen<br>
+        $1 USD = ₹84.07 INR for Rupee
+    </div>
+</div>
+
+<script>
+    const billTotalInput = document.getElementById('billTotal');
+    const currencySelect = document.getElementById('currency');
+    const tipPercentageSlider = document.getElementById('tipPercentage');
+    const tipPercentDisplay = document.getElementById('tipPercentDisplay');
+    const tipAmountDisplay = document.getElementById('tipAmount');
+    const totalAmountDisplay = document.getElementById('totalAmount');
+    const billError = document.getElementById('billError');
+
+    function updateTipAndTotal() {
+        const billTotal = parseFloat(billTotalInput.value);
+        const tipPercentage = parseInt(tipPercentageSlider.value);
+        const currencyRate = parseFloat(currencySelect.selectedOptions[0].dataset.rate);
+        const currencySymbol = currencySelect.value === 'USD' ? '$' : (currencySelect.value === 'INR' ? '₹' : '¥');
+
+        if (isNaN(billTotal) || billTotal < 0) {
+            billError.textContent = 'Please enter a valid positive number';
+            return;
+        } else {
+            billError.textContent = '';
+        }
+
+        // Tip calculation
+        const tipAmountUSD = (billTotal * tipPercentage) / 100;
+        const totalBillUSD = billTotal + tipAmountUSD;
+
+        // Convert to selected currency
+        const convertedTipAmount = tipAmountUSD * currencyRate;
+        const convertedTotalAmount = totalBillUSD * currencyRate;
+
+        // Update UI
+        tipAmountDisplay.textContent = `${currencySymbol}${convertedTipAmount.toFixed(2)}`;
+        totalAmountDisplay.textContent = `${currencySymbol}${convertedTotalAmount.toFixed(2)}`;
+    }
+
+    // Event listeners
+    billTotalInput.addEventListener('input', updateTipAndTotal);
+    currencySelect.addEventListener('change', updateTipAndTotal);
+    tipPercentageSlider.addEventListener('input', function() {
+        tipPercentDisplay.textContent = `${tipPercentageSlider.value}%`;
+        updateTipAndTotal();
+    });
+
+    // Initial calculation
+    updateTipAndTotal();
+</script>
+
+</body>
+</html>
