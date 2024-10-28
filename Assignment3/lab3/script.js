@@ -1,3 +1,4 @@
+// git check
 document.addEventListener('DOMContentLoaded', () => {
     const billInput = document.getElementById('billTotal');
     const currencySelect = document.getElementById('currencySelect');
