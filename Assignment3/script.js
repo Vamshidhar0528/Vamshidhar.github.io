@@ -1,79 +1,69 @@
-// git check
-document.addEventListener('DOMContentLoaded', () => {
+// Ensure the tip bar starts at 0% and updates on page load
+window.onload = function() {
+    document.getElementById('tipRange').value = 0;
+    document.getElementById('tipPercentDisplay').value = '0%';
+};
+
+// Function to validate the input and recalculate the values
+function validateAndCalculate() {
     const billInput = document.getElementById('billTotal');
-    const currencySelect = document.getElementById('currencySelect');
-    const tipSlider = document.getElementById('tipSlider');
-    const tipPercentageLabel = document.getElementById('tipPercentage');
-    const tipAmountLabel = document.getElementById('tipAmount');
-    const totalWithTipLabel = document.getElementById('totalWithTip');
     const errorMessage = document.getElementById('error-message');
+    const billValue = parseFloat(billInput.value);
+    
+    if (isNaN(billValue) || billValue <= 0) {
+        errorMessage.style.display = 'block';
+        document.getElementById('tipAmount').value = '';
+        document.getElementById('totalWithTip').value = '';
+    } else {
+        errorMessage.style.display = 'none';
+        calculateTip();
+    }
+}
+
+// Function to update the tip percentage display and calculate the tip
+function updateTipPercentage() {
+    const tipRange = document.getElementById('tipRange');
+    const tipPercentDisplay = document.getElementById('tipPercentDisplay');
+    tipPercentDisplay.value = `${tipRange.value}%`;
+    updateSliderColor(tipRange);
+    calculateTip();
+}
+
+// Function to calculate the tip amount and total bill with tip
+function calculateTip() {
+    const billInput = parseFloat(document.getElementById('billTotal').value);
+    const tipPercentage = parseFloat(document.getElementById('tipRange').value);
+    const currency = document.getElementById('currency').value;
+
+    if (isNaN(billInput) || billInput <= 0) {
+        return;
+    }
 
     const conversionRates = {
-        USD: 1,
-        JPY: 149.34,
-        INR: 84.07
+        usd: 1,
+        jpy: 149.34,
+        inr: 84.07
     };
 
     const currencySymbols = {
-        USD: '$',
-        JPY: '¥',
-        INR: '₹'
+        usd: '$',
+        jpy: '¥',
+        inr: '₹'
     };
 
-    function clearField() {
-        const billTotalInput = document.getElementById('billTotal');
-        billTotalInput.placeholder = ''; // Remove placeholder on focus
-        billTotalInput.removeEventListener('focus', clearField); // Remove event listener after first focus
-    }
-    
-    function validateBillAmount() {
-        const billAmount = parseFloat(billInput.value);
+    const tipAmountUSD = billInput * (tipPercentage / 100);
+    const totalWithTipUSD = billInput + tipAmountUSD;
 
-        // Validate if the bill amount is a positive number
-        if (isNaN(billAmount) || billAmount <= 0) {
-            errorMessage.style.display = 'Block';
-            billInput.value = '';  // Reset input field if invalid
-        } else {
-            errorMessage.style.display = 'none';
-        }
-    }
+    const convertedTip = (tipAmountUSD * conversionRates[currency]).toFixed(2);
+    const convertedTotal = (totalWithTipUSD * conversionRates[currency]).toFixed(2);
 
-    function calculateTipAndTotal() {
-        let billAmount = parseFloat(billInput.value);
+    document.getElementById('tipAmount').value = `${currencySymbols[currency]}${convertedTip}`;
+    document.getElementById('totalWithTip').value = `${currencySymbols[currency]}${convertedTotal}`;
+}
 
-        // Prevent calculation if billAmount is not valid
-        if (isNaN(billAmount) || billAmount <= 0) {
-            tipAmountLabel.textContent = `$0.00`;
-            totalWithTipLabel.textContent = `$0.00`;
-            return;
-        }
-
-        const selectedCurrency = currencySelect.value;
-        const tipPercentage = parseInt(tipSlider.value);
-
-        // Calculate the tip in USD
-        const tipAmountUSD = (billAmount * tipPercentage) / 100;
-
-        // Convert the bill and tip amount to the selected currency
-        const billInSelectedCurrency = billAmount * conversionRates[selectedCurrency];
-        const tipInSelectedCurrency = tipAmountUSD * conversionRates[selectedCurrency];
-        const totalInSelectedCurrency = billInSelectedCurrency + tipInSelectedCurrency;
-
-        // Update the displayed values
-        tipPercentageLabel.textContent = `${tipPercentage}%`;
-        tipAmountLabel.textContent = `${currencySymbols[selectedCurrency]}${tipInSelectedCurrency.toFixed(2)}`;
-        totalWithTipLabel.textContent = `${currencySymbols[selectedCurrency]}${totalInSelectedCurrency.toFixed(2)}`;
-    }
-
-    // Event listeners
-    billInput.addEventListener('input', () => {
-        validateBillAmount();
-        calculateTipAndTotal();
-    });
-
-    currencySelect.addEventListener('change', calculateTipAndTotal);
-    tipSlider.addEventListener('input', calculateTipAndTotal);
-
-    // Initial calculation
-    calculateTipAndTotal();
-});
+// Function to update slider color based on value
+function updateSliderColor(slider) {
+    const value = slider.value;
+    const percentage = (value / 100) * 100;
+    slider.style.background = `linear-gradient(to right, #4caf50 0%, #2196f3 ${percentage}%, #d3d3d3 ${percentage}%, #d3d3d3 100%)`;
+}
