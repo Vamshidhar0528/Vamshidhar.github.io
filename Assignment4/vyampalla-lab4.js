@@ -20,7 +20,11 @@
 })();
 // 6 In the services section change the icons color to a light blue (#6495ed).
 (function(){
-    document.querySelector('.material-symbols-outlined.text-6xl').style.color = '#6495ed';
+    (function () {
+        document.querySelector('[data-icon="digital"]').style.color = '#6495ed';
+        document.querySelector('[data-icon="brand"]').style.color = '#6495ed';
+        document.querySelector('[data-icon="social"]').style.color = '#6495ed';
+    })();
 })();
 // 7 The icons use the “Material Symbols Outlined” library. Change the digital marketing icon to use ‘Ads Click’ instead of the current icon.
 (function(){
