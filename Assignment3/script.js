@@ -68,19 +68,3 @@ function updateSliderColor(slider) {
     slider.style.background = `linear-gradient(to right, #4caf50 0%, #2196f3 ${percentage}%, #d3d3d3 ${percentage}%, #d3d3d3 100%)`;
 }
 
-// Graduate Additional Requirements
-(function() {
-    const contactForm = document.querySelector('form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default submission
-            const name = contactForm.querySelector('input[name="name"]').value;
-            const email = contactForm.querySelector('input[name="email"]').value;
-            if (name && email) {
-                alert(`Thank you, ${name}! We will be in touch with you shortly at ${email}.`);
-            } else {
-                alert("Please provide a name and email.");
-            }
-        });
-    }
-})();
